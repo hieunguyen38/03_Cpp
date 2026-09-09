@@ -413,6 +413,23 @@ int main() {
 
 Trong tài liệu này ta dùng `using namespace std;` cho code ngắn gọn, dễ học. Trong dự án lớn, nhiều lập trình viên viết tường minh `std::cout` để tránh xung đột tên (xem thêm bài #26 - Omitting Namespace).
 
+### 4. Statements - Câu lệnh
+
+Mỗi dòng lệnh thực thi trong C++ được gọi là một **statement (câu lệnh)**, và **bắt buộc phải kết thúc bằng dấu chấm phẩy `;`** — giống hệt quy tắc trong C. Nếu quên dấu `;`, chương trình sẽ báo lỗi biên dịch.
+
+```cpp
+cout << "Hello World!"
+// error: expected ';' before 'return' (do thieu dau ';')
+```
+
+Một chương trình C++ thường có nhiều statement, được thực thi **tuần tự theo đúng thứ tự viết**:
+
+```cpp
+cout << "Hello World!";       // Statement 1: chạy trước
+cout << "Have a good day!";   // Statement 2: chạy sau
+return 0;                       // Statement 3: chạy cuối cùng
+```
+
 ---
 
 <div id="bai-04"></div>
@@ -728,6 +745,23 @@ cout << sizeof(int);     // Thường in ra 4 (bytes)
 cout << sizeof(double);  // Thường in ra 8 (bytes)
 ```
 
+### 4. Từ khóa `auto` — tự động suy luận kiểu dữ liệu
+
+### KHÁI NIỆM MỚI so với C (từ C++11)
+
+`auto` giúp trình biên dịch **tự động xác định kiểu dữ liệu** dựa trên giá trị gán vào, giúp code gọn hơn, đặc biệt với các kiểu dài/phức tạp.
+
+```cpp
+auto x = 5;          // Trình biên dịch tự hiểu x là int
+auto y = 3.14;        // Tự hiểu y là double
+auto ten = "Laptop";   // Tự hiểu ten là const char*
+auto gia = 15990000.5; // Tự hiểu gia là double
+
+cout << x << " " << y << " " << ten << " " << gia;
+```
+
+> 📌 Biến khai báo bằng `auto` **bắt buộc phải được khởi tạo giá trị ngay lúc khai báo**, vì trình biên dịch cần có giá trị để suy luận ra kiểu — không thể viết `auto x;` rồi gán sau. `auto` đặc biệt hữu ích khi làm việc với kiểu dài dòng như iterator của STL (Chương 25).
+
 ---
 
 <div id="bai-16"></div>
@@ -841,7 +875,21 @@ cout << a % b << "\n";   // 1
 cout << (a > b) << "\n"; // 1 (true)
 ```
 
-### 6. Toán tử duy nhất C++ bổ sung mới: `::` (Scope Resolution)
+### 6. Operator Precedence - Thứ tự ưu tiên toán tử
+
+Khi một biểu thức có nhiều toán tử, C++ tuân theo **thứ tự ưu tiên (order of operations)** để quyết định phần nào tính trước — giống quy tắc toán học thông thường (nhân/chia trước, cộng/trừ sau):
+
+```cpp
+int result1 = 2 + 3 * 4;     // Nhân trước: 2 + 12 = 14
+int result2 = (2 + 3) * 4;   // Ngoặc trước: 5 * 4 = 20
+
+cout << result1 << "\n";  // 14
+cout << result2 << "\n";  // 20
+```
+
+> 🎯 **Lời khuyên:** Khi không chắc chắn về thứ tự ưu tiên giữa các toán tử, hãy chủ động dùng dấu ngoặc đơn `()` để làm rõ ý định và tránh lỗi logic khó phát hiện — thói quen này an toàn cho cả người mới lẫn người có kinh nghiệm.
+
+### 7. Toán tử duy nhất C++ bổ sung mới: `::` (Scope Resolution)
 
 ```cpp
 std::cout << "Su dung tuong minh, khong can 'using namespace std;'";
@@ -975,6 +1023,43 @@ cout << myString[0];
 ```
 
 > 📌 Chỉ số chuỗi bắt đầu từ 0: `[0]` là ký tự đầu tiên, `[1]` là ký tự thứ hai...
+
+### Lấy ký tự cuối cùng của chuỗi
+
+```cpp
+string myString = "Hello";
+cout << myString[myString.length() - 1];
+// Outputs o
+```
+
+### Thay đổi ký tự trong chuỗi (Change String Characters)
+
+Để thay đổi 1 ký tự tại vị trí cụ thể, dùng chỉ số kết hợp dấu nháy đơn:
+
+```cpp
+string myString = "Hello";
+myString[0] = 'J';
+cout << myString;
+// Outputs Jello thay vi Hello
+```
+
+### Hàm `at()` — cách khác để truy cập ký tự
+
+Thư viện `<string>` còn cung cấp hàm `at()` để truy cập (và thay đổi) ký tự trong chuỗi, thay cho cú pháp `[]`:
+
+```cpp
+string myString = "Hello";
+cout << myString; // Hello
+
+cout << myString.at(0); // Ky tu dau tien: H
+cout << myString.at(1); // Ky tu thu hai: e
+cout << myString.at(myString.length() - 1); // Ky tu cuoi cung: o
+
+myString.at(0) = 'J';
+cout << myString; // Outputs Jello
+```
+
+> 🎯 `at()` và `[]` cho kết quả tương tự, nhưng `at()` sẽ tự động kiểm tra và ném ra ngoại lệ (`out_of_range`, xem Chương 21 - Exception Handling) nếu chỉ số vượt quá độ dài chuỗi — an toàn hơn `[]` (vốn không kiểm tra, dễ gây lỗi truy cập vùng nhớ không hợp lệ).
 
 ---
 
@@ -1284,6 +1369,27 @@ cout << thongDiep;
 
 > 📌 **Lưu ý:** Toán tử ba ngôi lồng nhau tuy hoạt động tốt, nhưng thường **khó đọc hơn** khi có từ 3 điều kiện trở lên. Trong trường hợp đó, nên quay lại dùng `if...else if...else` truyền thống (bài #35) để code rõ ràng, dễ bảo trì hơn.
 
+### Nested If - Câu lệnh if lồng nhau
+
+Có thể đặt một câu lệnh `if` bên trong một `if` khác — gọi là **nested if**. Điều kiện bên trong chỉ được kiểm tra khi điều kiện bên ngoài đã đúng:
+
+```cpp
+int tuoi = 25;
+bool coBangLai = true;
+
+if (tuoi >= 18) {                 // Điều kiện ngoài
+    if (coBangLai) {               // Điều kiện trong - chỉ kiểm tra khi tuoi >= 18 đã đúng
+        cout << "Duoc phep lai xe.";
+    } else {
+        cout << "Du tuoi nhung can co bang lai.";
+    }
+} else {
+    cout << "Chua du tuoi de lai xe.";
+}
+```
+
+> 📌 Nested if thường có thể thay bằng toán tử `&&` (bài #16) để gọn hơn: `if (tuoi >= 18 && coBangLai)`. Tuy nhiên nested if hữu ích khi mỗi tầng điều kiện cần xử lý `else` khác nhau. Nên hạn chế lồng quá 2-3 tầng vì sẽ khó đọc.
+
 ---
 
 <div id="bai-38"></div>
@@ -1513,6 +1619,28 @@ cout << soPhanTu;   // 5
 ```
 
 > 📌 Trong dự án C++ thực tế, mảng tĩnh kiểu C ít được dùng trực tiếp mà thường thay bằng **Vector** (Chương 22) vì linh hoạt và an toàn hơn.
+
+### 5. Omit Array Size - Bỏ qua kích thước mảng
+
+Không bắt buộc phải chỉ định kích thước mảng — trình biên dịch tự đếm dựa trên số giá trị được khởi tạo:
+
+```cpp
+string cars[] = {"Volvo", "BMW", "Ford"};   // Tự động hiểu là mảng 3 phần tử
+// Tương đương: string cars[3] = {"Volvo", "BMW", "Ford"};
+```
+
+> ✅ Tuy vậy, việc ghi rõ kích thước (`string cars[3] = {...}`) vẫn được xem là "good practice" vì giảm nguy cơ lỗi khi code phát triển thêm.
+
+Cũng có thể khai báo mảng rỗng (có kích thước) rồi gán phần tử sau:
+
+```cpp
+string cars[5];        // Khai báo mảng 5 phần tử, chưa có giá trị
+cars[0] = "Volvo";
+cars[1] = "BMW";
+// ...
+```
+
+> ⚠️ Cách này **chỉ hoạt động khi đã chỉ định kích thước mảng**. Nếu viết `string cars[];` (không có kích thước, không có giá trị khởi tạo) sẽ bị lỗi biên dịch `array size missing`.
 
 ---
 
@@ -1761,9 +1889,25 @@ cout << food << "\n";    // Hamburger (biến gốc food cũng đã đổi theo!
 
 ### 1. Tại sao cần quản lý bộ nhớ thủ công?
 
-Khi khai báo biến bình thường, C++ tự động cấp phát/giải phóng bộ nhớ (Stack). Nhưng khi cần tạo bộ nhớ **lúc chương trình đang chạy** (VD: dựa theo input người dùng), ta phải tự cấp phát trên Heap và tự giải phóng khi dùng xong.
+Khi khai báo biến bình thường (VD: `int myNumber = 10;`), C++ tự động cấp phát/giải phóng bộ nhớ (Stack) — bạn không cần lo quản lý bộ nhớ. Nhưng khi cần tạo bộ nhớ **lúc chương trình đang chạy** (VD: dựa theo input người dùng), ta phải tự cấp phát trên Heap và tự giải phóng khi dùng xong.
 
-### 2. Cú pháp `new` và `delete` — thay thế `malloc`/`free` của C
+### 2. Get Memory Size - Kiểm tra kích thước bộ nhớ của kiểu dữ liệu
+
+Dùng toán tử `sizeof` để biết một kiểu/biến chiếm bao nhiêu byte bộ nhớ — hữu ích để viết code tối ưu hơn, đặc biệt với chương trình lớn:
+
+```cpp
+int myInt;
+float myFloat;
+double myDouble;
+char myChar;
+
+cout << sizeof(myInt) << "\n";     // 4 bytes (thường gặp)
+cout << sizeof(myFloat) << "\n";   // 4 bytes
+cout << sizeof(myDouble) << "\n";  // 8 bytes
+cout << sizeof(myChar) << "\n";    // 1 byte
+```
+
+### 3. Cú pháp `new` và `delete` — thay thế `malloc`/`free` của C
 
 ```cpp
 // Cấp phát 1 biến int trên Heap
@@ -1777,7 +1921,43 @@ int* mang = new int[10];  // Tương đương malloc(10 * sizeof(int)) trong C
 delete[] mang;             // Dùng delete[] khi giải phóng mảng
 ```
 
-### 3. So sánh cấp phát bộ nhớ động C vs C++
+### 4. Ví dụ thực tế: Mảng động theo số lượng do người dùng nhập
+
+Mảng động rất hữu ích khi **không biết trước kích thước mảng** — kích thước phụ thuộc vào input người dùng hoặc giá trị khác chỉ có lúc chạy chương trình:
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    int soKhach;
+    cout << "Co bao nhieu khach? ";
+    cin >> soKhach;
+
+    if (soKhach <= 0) {
+        cout << "So khach phai it nhat la 1.\n";
+        return 0;
+    }
+
+    string* danhSachKhach = new string[soKhach];   // Cấp phát đúng số phần tử cần dùng
+    cin.ignore();   // Bỏ ký tự xuống dòng còn sót lại sau khi nhập soKhach
+
+    for (int i = 0; i < soKhach; i++) {
+        cout << "Nhap ten khach " << (i + 1) << ": ";
+        getline(cin, danhSachKhach[i]);
+    }
+
+    for (int i = 0; i < soKhach; i++) {
+        cout << danhSachKhach[i] << "\n";
+    }
+
+    delete[] danhSachKhach;   // Nhớ giải phóng sau khi dùng xong
+    return 0;
+}
+```
+
+### 5. So sánh cấp phát bộ nhớ động C vs C++
 
 | Việc cần làm             | C                                    | C++                       |
 | -------------------------- | --------------------------------------- | ---------------------------- |
@@ -1880,6 +2060,55 @@ int main() {
     return 0;
 }
 ```
+
+### 5. Truyền mảng vào hàm (Pass Arrays)
+
+Khi truyền mảng vào hàm, chỉ cần truyền **tên mảng** (không cần chỉ số `[]`) — mảng luôn được truyền theo kiểu tham chiếu ngầm định, nên hàm thao tác trực tiếp trên mảng gốc:
+
+```cpp
+void showElements(int myNumbers[5]) {   // Khai báo đầy đủ kiểu + kích thước trong tham số
+    for (int i = 0; i < 5; i++) {
+        cout << myNumbers[i] << "\n";
+    }
+}
+
+int main() {
+    int myNumbers[5] = {10, 20, 30, 40, 50};
+    showElements(myNumbers);   // Chỉ truyền TÊN mảng, không cần chỉ số
+    return 0;
+}
+```
+
+> 📌 Vì mảng truyền vào hàm thực chất là truyền theo tham chiếu, **mọi thay đổi trên mảng bên trong hàm sẽ ảnh hưởng đến mảng gốc** ở nơi gọi hàm — khác với truyền biến thường (mặc định là tham trị, xem lại bài #57 mục 1).
+
+### 6. Truyền struct vào hàm (Pass Structures)
+
+```cpp
+struct Car {
+    string brand;
+    int year;
+};
+
+// Truyền theo tham trị (Pass by Value) - hàm chỉ nhận BẢN SAO, không đổi dữ liệu gốc
+void showCar(Car c) {
+    cout << c.brand << " - " << c.year << "\n";
+}
+
+// Truyền theo tham chiếu (Pass by Reference) - CÓ THỂ thay đổi dữ liệu gốc
+void updateYear(Car &c) {
+    c.year++;
+}
+
+int main() {
+    Car myCar = {"Toyota", 2020};
+    showCar(myCar);           // Chỉ đọc, không đổi
+    updateYear(myCar);         // Thay đổi thật sự trên myCar gốc
+    cout << "Nam moi: " << myCar.year;   // 2021
+    return 0;
+}
+```
+
+> 🎯 Dùng tham chiếu (`&`) khi muốn hàm thay đổi dữ liệu gốc của struct, hoặc khi struct có kích thước lớn (tránh chi phí sao chép không cần thiết mỗi lần gọi hàm).
 
 ---
 
@@ -2162,6 +2391,8 @@ int main() {
     return 0;
 }
 ```
+
+> 🎯 **Vì sao cần Constructor Overloading?** Nó cho phép **linh hoạt hơn khi tạo object** — người dùng class có thể chọn cách khởi tạo phù hợp với dữ liệu họ có sẵn (biết đủ thông tin thì dùng bản có tham số, chưa biết thì dùng bản mặc định rồi gán sau qua Setter). Trình biên dịch tự chọn đúng Constructor dựa vào số lượng/kiểu tham số truyền vào, giống hệt nguyên tắc nạp chồng hàm.
 
 ---
 
@@ -2468,6 +2699,54 @@ int main() {
 | **Xảy ra khi nào**   | Cùng 1 class, nhiều hàm cùng tên          | Class con định nghĩa lại hàm của class cha           |
 | **Yêu cầu kế thừa?** | ❌ Không cần                             | ✅ Bắt buộc phải có quan hệ kế thừa                  |
 | **Từ khóa cần dùng** | Không cần từ khóa đặc biệt                | `virtual` (class cha) và `override` (class con)      |
+
+### 5. Virtual Functions - Pure Virtual Function & Abstract Class
+
+Đây là phần mở rộng quan trọng của `virtual` (đã dùng ở mục 3) mà nhiều bạn học C++ hay bỏ sót.
+
+**Pure Virtual Function** là một hàm `virtual` **không có phần thân (implementation)** ở class cha, khai báo bằng cách gán `= 0`. Nó buộc mọi class con **phải** tự cài đặt lại hàm này:
+
+```cpp
+class Shape {
+  public:
+    virtual float tinhDienTich() = 0;   // Pure virtual function - không có thân hàm
+};
+
+class HinhVuong : public Shape {
+  private:
+    float canh;
+  public:
+    HinhVuong(float c) { canh = c; }
+    float tinhDienTich() override {      // Bắt buộc phải cài đặt lại
+        return canh * canh;
+    }
+};
+
+class HinhTron : public Shape {
+  private:
+    float banKinh;
+  public:
+    HinhTron(float bk) { banKinh = bk; }
+    float tinhDienTich() override {
+        return 3.14 * banKinh * banKinh;
+    }
+};
+
+int main() {
+    HinhVuong hv(4);
+    HinhTron ht(3);
+
+    cout << "Dien tich hinh vuong: " << hv.tinhDienTich() << "\n";
+    cout << "Dien tich hinh tron: " << ht.tinhDienTich() << "\n";
+    return 0;
+}
+```
+
+**Abstract Class (lớp trừu tượng)** là class chứa ít nhất 1 pure virtual function — trong ví dụ trên, `Shape` chính là abstract class. Đặc điểm quan trọng:
+
+- ❌ **Không thể tạo object trực tiếp** từ abstract class: `Shape s;` sẽ báo lỗi biên dịch.
+- ✅ Vẫn có thể dùng con trỏ hoặc tham chiếu tới abstract class: `Shape* s = new HinhVuong(4);`
+- 🎯 Abstract class dùng để định nghĩa một "giao diện chung" (interface) mà mọi class con bắt buộc phải tuân theo — hữu ích khi thiết kế hệ thống lớn (VD: nhiều loại sản phẩm khác nhau đều phải có hàm `tinhGiaKhuyenMai()` nhưng công thức tính mỗi loại lại khác nhau).
 
 ---
 
